@@ -14,26 +14,28 @@ int main(int argc, char** argv)
 	/// CREATE DOMAIN
 	unsigned int id = 1;
 
-    Parallelepiped domain(id);
-    Vector3d origin(1.0, 1.0, 1.0), length(1.0, 0.0, 0.0), height(0.0, 0.0, 1.0), width(0.0, 1.0, 0.0);
+	Parallelepiped domain(id);
+	Vector3d origin(1.0, 1.0, 1.0), length(1.0, 0.0, 0.0), height(0.0, 0.0, 1.0), width(0.0, 1.0, 0.0);
 
-    domain.BuildParallelepiped(origin, length, height, width);
-
-    MeshImport_Tetgen meshImportTetgen;
-    meshImportTetgen.SetMinimumNumberOfCells(100);
-    GenericMesh mesh;
-    meshImportTetgen.CreateTetgenInput(domain);
-    meshImportTetgen.CreateTetgenOutput(domain);
-    meshImportTetgen.CreateMesh(domain, mesh);
+	domain.BuildParallelepiped(origin, length, height, width);
+	
+	MeshImport_Tetgen meshImportTetgen;
+	meshImportTetgen.SetMinimumNumberOfCells(100);
+	GenericMesh mesh;
+	meshImportTetgen.CreateTetgenInput(domain);
+	meshImportTetgen.CreateTetgenOutput(domain);
+	meshImportTetgen.CreateMesh(domain, mesh);
 
 	/// REFINE MESH
+	// this is the section we had to implement (and also all the methods contained in it)
 	unsigned int numCellToRefiner = 10;
 	RefinerTetra refiner;
 	refiner.SetMesh(mesh);
 	refiner.InitializeIdCells(numCellToRefiner);
 	for(unsigned int numCell = 0; numCell < numCellToRefiner; numCell++)
-        refiner.AddIdCell(numCell);
-    //refiner.RefineMesh();
+		refiner.AddIdCell(numCell);
+	refiner.RefineMesh();
+	
 	/// OUTPUT MESH TO MATLAB SCRIPT FOR VISUALIZATION
 	mesh.CleanInactiveTreeNode();
 	ofstream file("plotTetrahedralMesh.m", ofstream::out );
